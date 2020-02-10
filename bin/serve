@@ -19,6 +19,41 @@ get '/ingredients' do
   erb :'ingredients/index', locals: { ingredients: ingredients }
 end
 
+get '/ingredients/*/edit' do
+  find_ingredient(params['splat'][0]) do |ingredient|
+    erb :'ingredients/edit', locals: { ingredient: ingredient }
+  end
+end
+
+put '/ingredients/*' do
+  find_ingredient(params['splat'][0]) do |ingredient|
+    result = YAML.dump(request.POST.fetch('ingredient'))
+    File.write(INGREDIENTS_DIR + '/' + ingredient.id, result)
+
+    redirect to("/ingredients/#{ingredient.id}")
+  end
+end
+
+get '/ingredients/*/delete' do
+  find_ingredient(params['splat'][0]) do |ingredient|
+    erb :'ingredients/delete', locals: { ingredient: ingredient }
+  end
+end
+
+delete '/ingredients/*' do
+  find_ingredient(params['splat'][0]) do |ingredient|
+    File.delete(INGREDIENTS_DIR + '/' + ingredient.id)
+
+    redirect to('/ingredients')
+  end
+end
+
+get '/ingredients/*' do
+  find_ingredient(params['splat'][0]) do |ingredient|
+    erb :'ingredients/show', locals: { ingredient: ingredient }
+  end
+end
+
 get '/recipes' do
   recipes = Dir[RECIPES_DIR + CONFIG_PATTERN].map do |filename|
     filename.gsub(RECIPES_DIR + '/', '')
@@ -27,33 +62,9 @@ get '/recipes' do
   erb :'recipes/index', locals: { recipes: recipes }
 end
 
-get '/ingredients/*/edit' do
-  find_ingredient(params['splat'][0]) do |ingredient_id, ingredient|
-    if ingredient.nil?
-      [404, "Not found: #{ingredient_id}"]
-    else
-      erb :'ingredients/edit', locals: { ingredient_id: ingredient_id, ingredient: ingredient }
-    end
-  end
-end
-
-get '/ingredients/*' do
-  find_ingredient(params['splat'][0]) do |ingredient_id, ingredient|
-    if ingredient.nil?
-      [404, "Not found: #{ingredient_id}"]
-    else
-      erb :'ingredients/show', locals: { ingredient: ingredient }
-    end
-  end
-end
-
 get '/recipes/*' do
-  find_recipe(params['splat'][0]) do |recipe_id, recipe|
-    if recipe.nil?
-      [404, "Not found: #{recipe_id}"]
-    else
-      erb :'recipes/show', locals: { recipe: recipe }
-    end
+  find_recipe(params['splat'][0]) do |recipe|
+    erb :'recipes/show', locals: { recipe: recipe }
   end
 end
 
@@ -76,10 +87,10 @@ def find_record(directory, id)
   filepath = File.expand_path(id, directory)
 
   if !filepath.start_with?(directory) || !File.exist?(filepath)
-    yield(id, nil)
+    [404, "Not found: #{id}"]
   else
-    record = OpenStruct.new(YAML.load_file(filepath)).freeze
+    record = OpenStruct.new(YAML.load_file(filepath).merge(id: id)).freeze
 
-    yield(id, record)
+    yield(record)
   end
 end

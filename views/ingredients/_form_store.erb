@@ -1,7 +1,7 @@
 <div class="form-inline ml-3 mt-2">
-  <label for="products[][stores][][name]" class="my-1 mr-2">Store:</label>
-  <input type="text" class="form-control" name="products[][stores][][name]" value="<%= store['name'] %>" />
-  <label for="products[][stores][][link]" class="my-1 mr-2 ml-2">Link:</label>
-  <input type="text" class="form-control" name="products[][stores][][link]" value="<%= store['link'] %>" />
+  <label for="ingredient[products][][stores][][name]" class="my-1 mr-2">Store:</label>
+  <input type="text" class="form-control" name="ingredient[products][][stores][][name]" value="<%= store['name'] %>" />
+  <label for="ingredient[products][][stores][][link]" class="my-1 mr-2 ml-2">Link:</label>
+  <input type="text" class="form-control" name="ingredient[products][][stores][][link]" value="<%= store['link'] %>" />
   <button type="button" class="btn btn-outline-danger ml-2" onclick="this.parentElement.remove()">Remove Store</button>
 </div>
