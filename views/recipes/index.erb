@@ -1,0 +1,10 @@
+<h1>Recipes</h1>
+<% recipes.group_by { |recipe| recipe.split('/', 2)[0] }.sort.each do |group, recipes_in_group| %>
+  <h2 style="text-transform: capitalize">
+    <%= group %>
+  </h2>
+  <% recipes_in_group.sort.each do |recipe| %>
+    <li><a href="recipes/<%= recipe %>"><%= recipe %></a></li>
+  <% end %>
+  </ul>
+<% end %>

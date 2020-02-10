@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+# frozen_string_literal true
+
+require 'ostruct'
+require 'sinatra'
+require 'yaml'
+
+RECIPES_DIR = File.expand_path('../data/recipes', __dir__)
+
+set :views, File.expand_path('../views', __dir__)
+
+get '/recipes' do
+  recipes = Dir[RECIPES_DIR + '/**/*.{yml,yaml}'].map do |filename|
+    filename.gsub(RECIPES_DIR + '/', '')
+  end
+
+  erb :'recipes/index', locals: { recipes: recipes }
+end
+
+get '/recipes/*' do
+  find_recipe(params['splat'][0]) do |recipe_id, recipe|
+    if recipe.nil?
+      [404, "Not found: #{recipe_id}"]
+    else
+      erb :'recipes/show', locals: { recipe: recipe }
+    end
+  end
+end
+
+# @param recipe_id [String]
+# @return [void]
+def find_recipe(recipe_id)
+  filepath = File.expand_path(recipe_id, RECIPES_DIR)
+
+  if !filepath.start_with?(RECIPES_DIR) || !File.exist?(filepath)
+    yield(recipe_id, nil)
+  else
+    recipe = OpenStruct.new(YAML.load_file(filepath)).freeze
+
+    yield(recipe_id, recipe)
+  end
+end
