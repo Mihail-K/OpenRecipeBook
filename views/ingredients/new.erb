@@ -1,0 +1,8 @@
+<h1>Create New Ingredient</h1>
+<%=
+  erb :'ingredients/_form', locals: {
+    ingredient: OpenStruct.new(products: ['stores' => [{}]]),
+    method:     "POST",
+    action:     "/ingredients"
+  }
+%>

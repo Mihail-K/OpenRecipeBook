@@ -19,6 +19,18 @@ get '/ingredients' do
   erb :'ingredients/index', locals: { ingredients: ingredients }
 end
 
+get '/ingredients/new' do
+  erb :'ingredients/new'
+end
+
+post '/ingredients' do
+  result = request.POST.fetch('ingredient')
+  id     = result.fetch('name', '').strip.downcase.gsub(/[_. ]+/, '-') + '.yml'
+
+  File.write(INGREDIENTS_DIR + '/' + id, YAML.dump(result))
+  redirect to("/ingredients/#{id}")
+end
+
 get '/ingredients/*/edit' do
   find_ingredient(params['splat'][0]) do |ingredient|
     erb :'ingredients/edit', locals: { ingredient: ingredient }

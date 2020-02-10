@@ -2,7 +2,13 @@
   <input type="hidden" name="_method" value="<%= method %>">
   <div class="form-group">
     <label for="ingredient[name]">Name:</label>
-    <input type="text" class="form-control" name="ingredient[name]" value="<%= ingredient.name %>" readonly />
+    <input
+      type="text"
+      class="form-control"
+      name="ingredient[name]"
+      value="<%= ingredient.name %>"
+      <%= ingredient.id && 'readonly' %>
+    />
   </div>
   <div id="products-list" class="form-group">
     Products:
