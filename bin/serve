@@ -5,16 +5,36 @@ require 'ostruct'
 require 'sinatra'
 require 'yaml'
 
-RECIPES_DIR = File.expand_path('../data/recipes', __dir__)
+INGREDIENTS_DIR = File.expand_path('../data/ingredients', __dir__)
+RECIPES_DIR     = File.expand_path('../data/recipes', __dir__)
+CONFIG_PATTERN  = '/**/*.{yml,yaml}'
 
 set :views, File.expand_path('../views', __dir__)
 
+get '/ingredients' do
+  ingredients = Dir[INGREDIENTS_DIR + CONFIG_PATTERN].map do |filename|
+    filename.gsub(INGREDIENTS_DIR + '/', '')
+  end
+
+  erb :'ingredients/index', locals: { ingredients: ingredients }
+end
+
 get '/recipes' do
-  recipes = Dir[RECIPES_DIR + '/**/*.{yml,yaml}'].map do |filename|
+  recipes = Dir[RECIPES_DIR + CONFIG_PATTERN].map do |filename|
     filename.gsub(RECIPES_DIR + '/', '')
   end
 
   erb :'recipes/index', locals: { recipes: recipes }
+end
+
+get '/ingredients/*' do
+  find_ingredient(params['splat'][0]) do |ingredient_id, ingredient|
+    if ingredient.nil?
+      [404, "Not found: #{ingredient_id}"]
+    else
+      erb :'ingredients/show', locals: { ingredient: ingredient }
+    end
+  end
 end
 
 get '/recipes/*' do
@@ -27,16 +47,29 @@ get '/recipes/*' do
   end
 end
 
+# @param ingredient_id [String]
+# @return [void]
+def find_ingredient(ingredient_id, &block)
+  find_record(INGREDIENTS_DIR, ingredient_id, &block)
+end
+
 # @param recipe_id [String]
 # @return [void]
-def find_recipe(recipe_id)
-  filepath = File.expand_path(recipe_id, RECIPES_DIR)
+def find_recipe(recipe_id, &block)
+  find_record(RECIPES_DIR, recipe_id, &block)
+end
 
-  if !filepath.start_with?(RECIPES_DIR) || !File.exist?(filepath)
-    yield(recipe_id, nil)
+# @param directory [String]
+# @param id [String]
+# @return [void]
+def find_record(directory, id)
+  filepath = File.expand_path(id, directory)
+
+  if !filepath.start_with?(directory) || !File.exist?(filepath)
+    yield(id, nil)
   else
-    recipe = OpenStruct.new(YAML.load_file(filepath)).freeze
+    record = OpenStruct.new(YAML.load_file(filepath)).freeze
 
-    yield(recipe_id, recipe)
+    yield(id, record)
   end
 end
