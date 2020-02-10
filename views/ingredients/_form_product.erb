@@ -1,0 +1,30 @@
+<div class="ml-3 mt-2">
+  <div class="form-group no-gutters">
+    <label for="products[][name]">Product:</label>
+    <div class="input-group col-6">
+      <input type="text" class="form-control" name="products[][name]" value="<%= product['name'] %>" />
+      <div class="input-group-append">
+        <button
+          type="button"
+          class="btn btn-outline-danger"
+          onclick="this.parentElement.parentElement.parentElement.parentElement.remove()"
+        >
+          Remove Product
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="form-group" data-meta="stores">
+    Stores:
+    <% product['stores']&.each do |store| %>
+    <%= erb :'ingredients/_form_store', locals: { store: store } %>
+    <% end %>
+  </div>
+  <button
+    type="button"
+    class="btn btn-outline-secondary"
+    onclick="addStoreToProduct(this.parentElement.querySelector('div[data-meta=\'stores\']'))"
+  >
+    Add Store
+  </button>
+</div>

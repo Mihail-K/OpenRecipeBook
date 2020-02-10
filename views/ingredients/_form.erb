@@ -1,0 +1,34 @@
+<form method="POST" action="<%= action %>">
+  <div class="form-group">
+    <label for="name">Name:</label>
+    <input type="text" class="form-control" name="name" value="<%= ingredient.name %>" disabled />
+  </div>
+  <div id="products-list" class="form-group">
+    Products:
+    <% ingredient.products&.each do |product| %>
+    <%= erb :'ingredients/_form_product', locals: { product: product } %>
+    <% end %>
+  </div>
+  <button type="button" class="btn btn-outline-secondary" onclick="addProduct()">Add Product</button>
+  <button type="submit" class="btn btn-primary float-right">Save Changes</button>
+</form>
+<div id="null-form-product" style="display: none">
+  <%= erb :'ingredients/_form_product', locals: { product: { 'stores' => [{}] } } %>
+</div>
+<div id="null-form-store" style="display: none">
+  <%= erb :'ingredients/_form_store', locals: { store: {} } %>
+</div>
+<script>
+  function addProduct() {
+    const container = document.getElementById('products-list');
+    const template  = document.getElementById('null-form-product').firstElementChild;
+
+    container.appendChild(template.cloneNode(true));
+  }
+
+  function addStoreToProduct(container) {
+    const template = document.getElementById('null-form-store').firstElementChild;
+
+    container.appendChild(template.cloneNode(true));
+  }
+</script>

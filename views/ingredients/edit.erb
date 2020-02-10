@@ -1,0 +1,2 @@
+<h1>Edit Ingredient: <%= ingredient.name %></h1>
+<%= erb :'ingredients/_form', locals: { ingredient: ingredient, action: "/ingredients/#{ingredient_id}/edit" } %>
