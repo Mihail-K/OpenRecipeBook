@@ -74,6 +74,12 @@ get '/recipes' do
   erb :'recipes/index', locals: { recipes: recipes }
 end
 
+get '/recipes/*/edit' do
+  find_recipe(params['splat'][0]) do |recipe|
+    erb :'recipes/edit', locals: { recipe: recipe }
+  end
+end
+
 get '/recipes/*' do
   find_recipe(params['splat'][0]) do |recipe|
     erb :'recipes/show', locals: { recipe: recipe }
